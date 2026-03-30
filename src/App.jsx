@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import Sidebar from './components/Sidebar';
 import Overview from './pages/Overview';
 import CropHealth from './pages/CropHealth';
@@ -6,6 +6,8 @@ import SoilWater from './pages/SoilWater';
 import Market from './pages/Market';
 import Sensors from './pages/Sensors';
 import Alerts from './pages/Alerts';
+import AuthContext from './contexts/AuthContext';
+import Login from './components/Login';
 
 const pageMap = {
   overview: Overview,
@@ -18,6 +20,10 @@ const pageMap = {
 
 export default function App() {
   const [activePage, setActivePage] = useState('overview');
+  const { user, loading } = useContext(AuthContext);
+
+  if (loading) return null;
+  if (!user) return <Login />;
   const Page = pageMap[activePage] || Overview;
 
   return (
