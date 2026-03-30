@@ -68,6 +68,86 @@ function FieldCard({ field }) {
   );
 }
 
+function FarmoraCard({ onNav }) {
+  return (
+    <div
+      className="card"
+      onClick={() => onNav?.('farmora-ai')}
+      style={{
+        padding: '18px 18px',
+        cursor: 'pointer',
+        border: '1px solid rgba(126,200,126,0.18)',
+        background: 'linear-gradient(135deg, rgba(21,128,61,0.18), rgba(126,200,126,0.06))',
+        transition: 'all 0.2s ease',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+        <div
+          style={{
+            width: 38,
+            height: 38,
+            borderRadius: 12,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'linear-gradient(135deg, #22c55e, #15803d)',
+            color: '#fff',
+            fontSize: 18,
+            boxShadow: '0 8px 20px rgba(34,197,94,0.25)',
+          }}
+        >
+          🌿
+        </div>
+        <div>
+          <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 15, color: '#f0f4f0' }}>
+            Ask Farmora AI
+          </div>
+          <div style={{ fontSize: 11, color: '#8a9e8a', marginTop: 2 }}>
+            Multilingual crop analysis
+          </div>
+        </div>
+      </div>
+
+      <div style={{ fontSize: 12, color: '#cfe9d7', lineHeight: 1.5, marginBottom: 12 }}>
+        Upload a crop image, ask a farming question, or use audio to get location-aware AI guidance.
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              padding: '5px 8px',
+              borderRadius: 999,
+              background: 'rgba(255,255,255,0.08)',
+              color: '#7ec87e',
+            }}
+          >
+            AI Chat
+          </span>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              padding: '5px 8px',
+              borderRadius: 999,
+              background: 'rgba(255,255,255,0.08)',
+              color: '#80c0f0',
+            }}
+          >
+            Voice
+          </span>
+        </div>
+
+        <div style={{ fontSize: 12, fontWeight: 700, color: '#7ec87e' }}>
+          Open →
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
@@ -86,11 +166,10 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export default function Overview({ onNav }) {
   const totalHectares = farmFields.reduce((s, f) => s + f.hectares, 0);
-  const healthyCount  = farmFields.filter(f => f.status === 'healthy').length;
+  const healthyCount = farmFields.filter(f => f.status === 'healthy').length;
 
   return (
     <div style={{ padding: '28px 32px', maxWidth: 1200 }}>
-      {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
           <span style={{ fontSize: 22 }}>🌾</span>
@@ -102,15 +181,13 @@ export default function Overview({ onNav }) {
         </div>
       </div>
 
-      {/* Key metrics */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-        <MetricCard label="Total Area"     value={totalHectares.toFixed(1)} unit="ha" sub="4 active fields"         icon="🌍" color="#7ec87e" delay={0}   />
-        <MetricCard label="Healthy Fields" value={healthyCount}             unit={`/${farmFields.length}`}          sub="2 need attention"   icon="🌱" color="#7ec87e" delay={50}  />
-        <MetricCard label="Avg Moisture"   value="53"                       unit="%"  sub="↓ Field D critical"      icon="💧" color="#80c0f0" delay={100} />
-        <MetricCard label="Active Alerts"  value="2"                        unit=""   sub="1 critical — act now"    icon="⚠️" color="#e8a020" delay={150} pulse />
+        <MetricCard label="Total Area" value={totalHectares.toFixed(1)} unit="ha" sub="4 active fields" icon="🌍" color="#7ec87e" delay={0} />
+        <MetricCard label="Healthy Fields" value={healthyCount} unit={`/${farmFields.length}`} sub="2 need attention" icon="🌱" color="#7ec87e" delay={50} />
+        <MetricCard label="Avg Moisture" value="53" unit="%" sub="↓ Field D critical" icon="💧" color="#80c0f0" delay={100} />
+        <MetricCard label="Active Alerts" value="2" unit="" sub="1 critical — act now" icon="⚠️" color="#e8a020" delay={150} pulse />
       </div>
 
-      {/* Charts row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
         <div className="card" style={{ padding: '20px 24px' }}>
           <div style={{ marginBottom: 16 }}>
@@ -121,13 +198,13 @@ export default function Overview({ onNav }) {
             <AreaChart data={soilMetrics}>
               <defs>
                 <linearGradient id="moistGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#3a8cc8" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#3a8cc8" stopOpacity={0}   />
+                  <stop offset="5%" stopColor="#3a8cc8" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#3a8cc8" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-              <XAxis dataKey="time"     tick={{ fill: '#8a9e8a', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis                    tick={{ fill: '#8a9e8a', fontSize: 11 }} axisLine={false} tickLine={false} domain={[30, 80]} />
+              <XAxis dataKey="time" tick={{ fill: '#8a9e8a', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: '#8a9e8a', fontSize: 11 }} axisLine={false} tickLine={false} domain={[30, 80]} />
               <Tooltip content={<CustomTooltip />} />
               <Area type="monotone" dataKey="moisture" name="Moisture %" stroke="#3a8cc8" fill="url(#moistGrad)" strokeWidth={2} dot={false} />
             </AreaChart>
@@ -143,26 +220,24 @@ export default function Overview({ onNav }) {
             <LineChart data={yieldForecast}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
               <XAxis dataKey="month" tick={{ fill: '#8a9e8a', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis                 tick={{ fill: '#8a9e8a', fontSize: 11 }} axisLine={false} tickLine={false} domain={[1.5, 4.5]} />
+              <YAxis tick={{ fill: '#8a9e8a', fontSize: 11 }} axisLine={false} tickLine={false} domain={[1.5, 4.5]} />
               <Tooltip content={<CustomTooltip />} />
-              <Line type="monotone" dataKey="actual"   name="Actual"      stroke="#7ec87e" strokeWidth={2.5} dot={{ fill: '#7ec87e', r: 3 }} connectNulls={false} />
-              <Line type="monotone" dataKey="forecast" name="AI Forecast" stroke="#e8a020" strokeWidth={2}   strokeDasharray="5 4" dot={false} />
+              <Line type="monotone" dataKey="actual" name="Actual" stroke="#7ec87e" strokeWidth={2.5} dot={{ fill: '#7ec87e', r: 3 }} connectNulls={false} />
+              <Line type="monotone" dataKey="forecast" name="AI Forecast" stroke="#e8a020" strokeWidth={2} strokeDasharray="5 4" dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* Fields + Alerts + Weather */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 280px', gap: 20 }}>
-        {/* Fields */}
         <div>
           <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15, color: '#f0f4f0', marginBottom: 12 }}>Field Status</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {farmFields.map(f => <FieldCard key={f.id} field={f} />)}
+            <FarmoraCard onNav={onNav} />
           </div>
         </div>
 
-        {/* Alerts — clickable → navigate to alerts page */}
         <div>
           <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15, color: '#f0f4f0', marginBottom: 12 }}>Recent Alerts</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -195,7 +270,6 @@ export default function Overview({ onNav }) {
           </div>
         </div>
 
-        {/* Weather — clickable → navigate to weather page */}
         <div>
           <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15, color: '#f0f4f0', marginBottom: 12 }}>Weather</div>
           <div
@@ -213,8 +287,8 @@ export default function Overview({ onNav }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(74,158,74,0.1)' }}>
               {[
                 { icon: '💧', val: `${weatherData.current.humidity}%`, label: 'Humidity' },
-                { icon: '🌬', val: `${weatherData.current.wind}km/h`,   label: 'Wind'     },
-                { icon: '☀️', val: 'UV 4',                              label: 'Index'    },
+                { icon: '🌬', val: `${weatherData.current.wind}km/h`, label: 'Wind' },
+                { icon: '☀️', val: 'UV 4', label: 'Index' },
               ].map(m => (
                 <div key={m.label} style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: 16 }}>{m.icon}</div>
@@ -240,7 +314,6 @@ export default function Overview({ onNav }) {
         </div>
       </div>
 
-      {/* Market strip */}
       <div style={{ marginTop: 24 }}>
         <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15, color: '#f0f4f0', marginBottom: 12 }}>
           Live Market Prices <span className="chip chip-green" style={{ marginLeft: 8, verticalAlign: 'middle' }}>Live</span>
