@@ -40,14 +40,14 @@ export default function App() {
           padding: '12px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
         }}>
           <div style={{ fontSize: 13, color: '#8a9e8a' }}>
-            <span style={{ color: '#4a9e4a' }}>Thabo Farm</span> · Limpopo, South Africa
+            <span style={{ color: '#4a9e4a' }}>Thabo Farm</span> · Gauteng, South Africa
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#4a9e4a' }}>
               <span className="status-dot status-ok"></span>
               Live · 7/7 sensors active
             </div>
-            <div style={{ fontSize: 13, color: '#8a9e8a' }}>⛅ 24°C · Limpopo</div>
+            <div style={{ fontSize: 13, color: '#8a9e8a' }}>⛅ 24°C · Gauteng</div>
             <div style={{ 
               width: 32, height: 32, borderRadius: '50%',
               background: 'linear-gradient(135deg, #2d6a2d, #7ec87e)',
