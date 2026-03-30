@@ -6,6 +6,8 @@ import SoilWater from './pages/SoilWater';
 import Market from './pages/Market';
 import Sensors from './pages/Sensors';
 import Alerts from './pages/Alerts';
+import Weather from './pages/Weather';
+
 
 const pageMap = {
   overview: Overview,
@@ -14,6 +16,7 @@ const pageMap = {
   market: Market,
   sensors: Sensors,
   alerts: Alerts,
+  weather: Weather,
 };
 
 export default function App() {
