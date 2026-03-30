@@ -39,7 +39,7 @@ export default function Weather() {
           🌦 Weather Intelligence
         </h1>
         <div style={{ fontSize: 14, color: '#8a9e8a' }}>
-          Limpopo, South Africa · Live forecast · AI-adjusted irrigation planning
+          Gauteng, South Africa · Live forecast · AI-adjusted irrigation planning
         </div>
       </div>
 
@@ -63,7 +63,7 @@ export default function Weather() {
               <div style={{ fontSize: 16, color: '#8a9e8a', marginTop: 4 }}>{current.condition}</div>
             </div>
           </div>
-          <div style={{ fontSize: 13, color: '#4a9e4a', fontWeight: 600 }}>📍 Limpopo, South Africa · Monday 30 March 2026</div>
+          <div style={{ fontSize: 13, color: '#4a9e4a', fontWeight: 600 }}>📍 Gauteng, South Africa · Monday 30 March 2026</div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, minWidth: 280 }}>
           {[

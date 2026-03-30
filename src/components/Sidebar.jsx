@@ -107,9 +107,7 @@ export default function Sidebar({ active, onNav, onAiOpen }) {
             Thabo&apos;s Farm
             <span style={{ fontSize: 10, color: '#7ec87e' }}>▼</span>
           </div>
-          <div style={{ fontSize: 11, color: '#4a9e4a', marginTop: 2 }}>
-            Limpopo, RSA · 10 ha
-          </div>
+          <div style={{ fontSize: 11, color: '#4a9e4a', marginTop: 2 }}>Limpopo, RSA · 10 ha</div>
         </div>
       </div>
 

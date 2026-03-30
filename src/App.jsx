@@ -59,7 +59,7 @@ export default function App() {
           }}
         >
           <div style={{ fontSize: 13, color: '#8a9e8a' }}>
-            <span style={{ color: '#4a9e4a' }}>Thabo Farm</span> · Limpopo, South Africa
+            <span style={{ color: '#4a9e4a' }}>Thabo Farm</span> · Gauteng, South Africa
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -75,26 +75,13 @@ export default function App() {
               <span className="status-dot status-ok"></span>
               Live · 7/7 sensors active
             </div>
-
             <div style={{ fontSize: 13, color: '#8a9e8a' }}>⛅ 24°C · Limpopo</div>
-
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #2d6a2d, #7ec87e)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 13,
-                fontWeight: 700,
-                color: '#0b150b',
-                cursor: 'pointer',
-              }}
-            >
-              T
-            </div>
+            <div style={{ 
+              width: 32, height: 32, borderRadius: '50%',
+              background: 'linear-gradient(135deg, #2d6a2d, #7ec87e)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 13, fontWeight: 700, color: '#0b150b', cursor: 'pointer'
+            }}>T</div>
           </div>
         </div>
 
