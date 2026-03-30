@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 const buyers = [
   { id: 1, name: 'FreshMart Johannesburg', type: 'Retailer', crops: ['Maize', 'Spinach'], rating: 4.8, distance: '120km', verified: true, priceOffer: 'R4,350/ton' },
   { id: 2, name: 'Agri Export SA', type: 'Exporter', crops: ['Maize', 'Sorghum'], rating: 4.6, distance: '85km', verified: true, priceOffer: 'R4,100/ton' },
-  { id: 3, name: 'Community Co-op Limpopo', type: 'Co-operative', crops: ['Tomatoes', 'Spinach'], rating: 4.9, distance: '32km', verified: true, priceOffer: 'R12,200/ton' },
+  { id: 3, name: 'Community Co-op Gauteng', type: 'Co-operative', crops: ['Tomatoes', 'Spinach'], rating: 4.9, distance: '32km', verified: true, priceOffer: 'R12,200/ton' },
   { id: 4, name: 'Spar Distribution Centre', type: 'Retail Chain', crops: ['Tomatoes'], rating: 4.4, distance: '210km', verified: true, priceOffer: 'R13,000/ton' },
 ];
 
