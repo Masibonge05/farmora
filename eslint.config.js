@@ -1,29 +1,20 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import { defineConfig, globalIgnores } from 'eslint/config'
+import nextVitals from 'eslint-config-next/core-web-vitals';
 
-export default defineConfig([
-  globalIgnores(['dist']),
+const eslintConfig = [
+  ...nextVitals,
   {
-    files: ['**/*.{js,jsx}'],
-    extends: [
-      js.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
+    ignores: [
+      'dist/**',
+      'legacy/**',
+      'src/legacy/**',
+      'src/App.jsx',
+      'src/main.jsx',
+      'src/components/**',
+      'src/pages/**',
+      'src/data/**',
+      'vite.config.js',
     ],
-    languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
-      },
-    },
-    rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-    },
   },
-])
+];
+
+export default eslintConfig;
