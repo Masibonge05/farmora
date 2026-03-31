@@ -3,8 +3,6 @@ import {
   ShoppingCart, Wifi, CloudRain, Rocket, LogOut, Network,
 } from 'lucide-react';
 
-import farmoraLogo from '../assets/farmora-logo.jpeg';
-
 const navItems = [
   { icon: LayoutDashboard, label: 'Overview', id: 'overview' },
   { icon: Leaf, label: 'Crop Health', id: 'crop-health' },
@@ -20,24 +18,15 @@ const navItems = [
 export default function Sidebar({
   active,
   onNav,
-  onAiOpen,
   isMobile,
   isOpen,
   onClose,
   userName,
   userEmail,
   avatarLetter,
-  onSignOut,
 }) {
   const handleNavClick = (id) => {
     onNav(id);
-    if (isMobile) {
-      onClose?.();
-    }
-  };
-
-  const handleSignOutClick = async () => {
-    await onSignOut?.();
     if (isMobile) {
       onClose?.();
     }
@@ -175,13 +164,14 @@ export default function Sidebar({
           Main Menu
         </div>
 
-        {navItems.map(({ icon: Icon, label, id }) => (
+        {/* eslint-disable-next-line no-unused-vars */}
+        {navItems.map(({ icon: IconComponent, label, id }) => (
           <div
             key={id}
             className={`nav-item ${active === id ? 'active' : ''}`}
             onClick={() => handleNavClick(id)}
           >
-            <Icon size={16} />
+            <IconComponent size={16} />
             {label}
           </div>
         ))}

@@ -1,14 +1,15 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   AreaChart, Area, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import { AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
-import { farmFields, soilMetrics, yieldForecast, alerts, weatherData, marketPrices } from '../data/dummyData';
+import { farmFields, soilMetrics, yieldForecast, alerts, marketPrices } from '../data/dummyData';
 import useMediaQuery from '../lib/useMediaQuery';
 import { getFieldStyle } from '../lib/fieldColors';
 import RealtimeStream from '../components/RealtimeStream.jsx';
 import useRealtimeFarmFeed from '../lib/useRealtimeFarmFeed';
+import { fetchWeather } from '../services/weatherService';
 
 const statusColor = { healthy: '#22c55e', warning: '#f59e0b', alert: '#ef4444' };
 const statusLabel = { healthy: 'Healthy', warning: 'Warning', alert: 'Alert' };
@@ -210,6 +211,27 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function Overview({ onNav }) {
+  const [weatherData, setWeatherData] = useState({
+    current: { temp: 24, humidity: 58, wind: 12, condition: 'Loading...', icon: '⏳', uvIndex: 0 }
+  });
+  const [weatherLoading, setWeatherLoading] = useState(true);
+
+  useEffect(() => {
+    const loadWeather = async () => {
+      try {
+        setWeatherLoading(true);
+        const data = await fetchWeather();
+        setWeatherData(data);
+      } catch (err) {
+        console.error('Weather fetch error:', err);
+      } finally {
+        setWeatherLoading(false);
+      }
+    };
+
+    loadWeather();
+  }, []);
+
   const realtimePath = '/farms/thabo-farm/latest';
   const { data: realtimeData, status: realtimeStatus } = useRealtimeFarmFeed(realtimePath);
   const criticalAlerts = alerts.filter((a) => a.type === 'alert').length;
@@ -468,29 +490,38 @@ export default function Overview({ onNav }) {
             onClick={() => onNav?.('weather')}
             style={{ padding: '20px', marginBottom: 10, cursor: 'pointer', transition: 'all 0.2s' }}
           >
-            <div style={{ textAlign: 'center', marginBottom: 14 }}>
-              <div style={{ fontSize: 40 }}>{weatherData.current.icon}</div>
-              <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '2.2rem', color: 'var(--text-strong)', lineHeight: 1 }}>
-                {weatherData.current.temp}C
+            {weatherLoading ? (
+              <div style={{ textAlign: 'center', padding: '20px' }}>
+                <div style={{ fontSize: 40, marginBottom: 10 }}>⏳</div>
+                <div style={{ fontSize: 13, color: 'var(--text-soft)' }}>Loading weather...</div>
               </div>
-              <div style={{ fontSize: 13, color: 'var(--text-soft)', marginTop: 4 }}>{weatherData.current.condition}</div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 12, paddingTop: 12 }}>
-              {[
-                { icon: 'H', val: `${weatherData.current.humidity}%`, label: 'Humidity' },
-                { icon: 'W', val: `${weatherData.current.wind}km/h`, label: 'Wind' },
-                { icon: 'U', val: 'UV 4', label: 'Index' },
-              ].map(m => (
-                <div key={m.label} style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 16 }}>{m.icon}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-strong)' }}>{m.val}</div>
-                  <div style={{ fontSize: 10, color: 'var(--text-soft)' }}>{m.label}</div>
+            ) : (
+              <>
+                <div style={{ textAlign: 'center', marginBottom: 14 }}>
+                  <div style={{ fontSize: 40 }}>{weatherData.current.icon}</div>
+                  <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '2.2rem', color: 'var(--text-strong)', lineHeight: 1 }}>
+                    {weatherData.current.temp}°C
+                  </div>
+                  <div style={{ fontSize: 13, color: 'var(--text-soft)', marginTop: 4 }}>{weatherData.current.condition}</div>
                 </div>
-              ))}
-            </div>
-            <div style={{ textAlign: 'center', marginTop: 10, fontSize: 11, color: 'var(--text-soft)', fontWeight: 600 }}>
-              Tap for full forecast 
-            </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 12, paddingTop: 12 }}>
+                  {[
+                    { icon: 'H', val: `${weatherData.current.humidity}%`, label: 'Humidity' },
+                    { icon: 'W', val: `${weatherData.current.wind}km/h`, label: 'Wind' },
+                    { icon: 'U', val: `UV ${Math.round(weatherData.current.uvIndex ?? 0)}`, label: 'Index' },
+                  ].map(m => (
+                    <div key={m.label} style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: 16 }}>{m.icon}</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-strong)' }}>{m.val}</div>
+                      <div style={{ fontSize: 10, color: 'var(--text-soft)' }}>{m.label}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ textAlign: 'center', marginTop: 10, fontSize: 11, color: 'var(--text-soft)', fontWeight: 600 }}>
+                  Tap for full forecast 
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
