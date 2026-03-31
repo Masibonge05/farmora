@@ -1,5 +1,4 @@
-import { useState, useContext } from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Sidebar from './components/Sidebar';
 import Overview from './pages/Overview';
 import CropHealth from './pages/CropHealth';
@@ -11,9 +10,7 @@ import Weather from './pages/Weather';
 import FarmoraAIPage from './pages/FarmoraAIPage';
 import AuthContext from './contexts/AuthContext';
 import Login from './components/Login';
-
 import { fetchWeather } from './services/weatherService';
-
 
 const pageMap = {
   overview: Overview,
@@ -61,7 +58,6 @@ function SplashScreen({ onDone }) {
         }
       `}</style>
 
-      {/* Pulsing rings */}
       <div style={{ position: 'absolute', width: 220, height: 220 }}>
         {[0, 0.5, 1].map(d => (
           <div key={d} style={{
@@ -72,7 +68,6 @@ function SplashScreen({ onDone }) {
         ))}
       </div>
 
-      {/* Logo */}
       <img
         src="/farmora-logo.png"
         alt="Farmora"
@@ -83,7 +78,6 @@ function SplashScreen({ onDone }) {
         }}
       />
 
-      {/* Progress bar */}
       <div style={{
         width: 140, height: 2, borderRadius: 2, overflow: 'hidden',
         background: 'rgba(74,158,74,0.15)',
@@ -102,24 +96,17 @@ function SplashScreen({ onDone }) {
 
 // ── App ─────────────────────────────────────────────────────────
 export default function App() {
-  const [activePage, setActivePage] = useState('overview');
-  const { user, loading } = useContext(AuthContext);
+  // ✅ ALL hooks must be declared first — before any early returns
+  const [activePage, setActivePage]     = useState('overview');
+  const [showSplash, setShowSplash]     = useState(true);
+  const [isDark, setIsDark]             = useState(true);
+  const [topbarWeather, setTopbarWeather] = useState(null);
+  const { user, loading }               = useContext(AuthContext);
 
-  if (loading) return null;
-  if (!user) return <Login />;
-  const [showSplash, setShowSplash]  = useState(true);
-  const [isDark, setIsDark]          = useState(true);
+  useEffect(() => {
+    fetchWeather().then(w => setTopbarWeather(w.current)).catch(() => {});
+  }, []);
 
-  const [topbarWeather, setTopbarWeather] = useState(null);  // ADD THIS
-
-// ADD THIS — fetch once on mount
-useEffect(() => {
-  fetchWeather().then(w => setTopbarWeather(w.current)).catch(() => {});
-}, []);
-
-  const Page = pageMap[activePage] || Overview;
-
-  // Inject light-mode overrides without touching any page component
   useEffect(() => {
     const id = 'farmora-light-theme';
     let el = document.getElementById(id);
@@ -151,6 +138,12 @@ useEffect(() => {
     }
   }, [isDark]);
 
+  // ✅ Early returns AFTER all hooks
+  if (loading) return null;
+  if (!user)   return <Login />;
+
+  const Page = pageMap[activePage] || Overview;
+
   return (
     <>
       {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
@@ -160,18 +153,16 @@ useEffect(() => {
         background: isDark ? '#0b150b' : '#edf6ed',
         transition: 'background 0.3s ease',
       }}>
-        {/* Background radial glow */}
         <div style={{
           position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0,
           background: 'radial-gradient(ellipse 60% 40% at 70% 20%, rgba(45,106,45,0.06) 0%, transparent 70%)',
         }} />
 
-        {/* Sidebar — your exact prop names preserved */}
         <Sidebar
           active={activePage}
           onNav={setActivePage}
           onAiOpen={() => setActivePage('farmora-ai')}
-          weather={topbarWeather}   // ADD THIS
+          weather={topbarWeather}
         />
 
         <main style={{ flex: 1, overflowY: 'auto', position: 'relative', zIndex: 1 }}>
@@ -196,11 +187,12 @@ useEffect(() => {
                 Live · 7/7 sensors active
               </div>
 
-<div style={{ fontSize: 13, color: isDark ? '#8a9e8a' : '#4a6a4a' }}>
-  {topbarWeather
-    ? `${topbarWeather.icon} ${topbarWeather.temp}°C · Gauteng`
-    : '⛅ Loading...'}
-</div>
+              <div style={{ fontSize: 13, color: isDark ? '#8a9e8a' : '#4a6a4a' }}>
+                {topbarWeather
+                  ? `${topbarWeather.icon} ${topbarWeather.temp}°C · Gauteng`
+                  : '⛅ Loading...'}
+              </div>
+
               {/* ── Dark / Light toggle ── */}
               <button
                 onClick={() => setIsDark(d => !d)}
@@ -241,7 +233,7 @@ useEffect(() => {
             {activePage === 'farmora-ai' ? (
               <FarmoraAIPage onBack={() => setActivePage('overview')} />
             ) : (
-<Page onNav={setActivePage} weather={topbarWeather} />
+              <Page onNav={setActivePage} weather={topbarWeather} />
             )}
           </div>
         </main>
