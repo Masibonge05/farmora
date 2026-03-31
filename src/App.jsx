@@ -23,6 +23,7 @@ import Sensors from './pages/Sensors';
 import Alerts from './pages/Alerts';
 import Weather from './pages/Weather';
 import FarmoraAIPage from './pages/FarmoraAIPage';
+import CropFieldDetail from './pages/CropFieldDetail';
 import AuthContext from './contexts/AuthContext';
 import Login from './components/Login';
 import useMediaQuery from './lib/useMediaQuery';
@@ -41,6 +42,7 @@ const pageMap = {
 const pageTitleMap = {
   overview: 'Farm Overview',
   'crop-health': 'Crop Health',
+  'crop-field-detail': 'Field Details',
   soil: 'Soil & Water',
   market: 'Market Prices',
   sensors: 'IoT Sensors',
@@ -60,23 +62,41 @@ const topNavItems = [
   { id: 'weather', label: 'Weather', icon: CloudRain },
 ];
 
+const THEME_STORAGE_KEY = 'farmora-theme';
+
+const getInitialTheme = () => {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+  if (savedTheme === 'dark') return true;
+  if (savedTheme === 'light') return false;
+
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+};
+
 export default function App() {
   const [activePage, setActivePage] = useState('overview');
+  const [selectedFieldId, setSelectedFieldId] = useState('field-a');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('farmora-theme') === 'dark');
+  const [darkMode, setDarkMode] = useState(getInitialTheme);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [profileMenuError, setProfileMenuError] = useState('');
   const [navIndicator, setNavIndicator] = useState({ left: 0, width: 0, visible: false });
+
   const profileMenuRef = useRef(null);
   const navShellRef = useRef(null);
   const navButtonRefs = useRef({});
+
   const { user, loading, signOut } = useContext(AuthContext);
   const isMobile = useMediaQuery('(max-width: 900px)');
   const isCompactHeader = useMediaQuery('(max-width: 1240px)');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-    localStorage.setItem('farmora-theme', darkMode ? 'dark' : 'light');
+    document.documentElement.style.colorScheme = darkMode ? 'dark' : 'light';
+    localStorage.setItem(THEME_STORAGE_KEY, darkMode ? 'dark' : 'light');
   }, [darkMode]);
 
   useEffect(() => {
@@ -106,8 +126,7 @@ export default function App() {
   }, [profileMenuOpen]);
 
   useEffect(() => {
-    if (isMobile) {
-      setNavIndicator((prev) => ({ ...prev, visible: false }));
+    if (isMobile || activePage === 'crop-field-detail') {
       return;
     }
 
@@ -131,16 +150,21 @@ export default function App() {
     return () => {
       window.removeEventListener('resize', updateIndicator);
       shell?.removeEventListener('scroll', updateIndicator);
+      setNavIndicator({ left: 0, width: 0, visible: false });
     };
   }, [activePage, isMobile, isCompactHeader]);
 
   const handleNav = (page) => {
     setActivePage(page);
-    if (isMobile) {
-      setSidebarOpen(false);
-    }
+    if (isMobile) setSidebarOpen(false);
     setProfileMenuOpen(false);
     setProfileMenuError('');
+  };
+
+  const openField = (fieldId) => {
+    setSelectedFieldId(fieldId);
+    setActivePage('crop-field-detail');
+    if (isMobile) setSidebarOpen(false);
   };
 
   const handleSignOut = async () => {
@@ -158,9 +182,7 @@ export default function App() {
     const currentName = user?.displayName || '';
     const nextName = window.prompt('Enter a display name', currentName);
 
-    if (nextName === null) {
-      return;
-    }
+    if (nextName === null) return;
 
     const cleanName = nextName.trim();
     if (!cleanName) {
@@ -179,6 +201,7 @@ export default function App() {
 
   if (loading) return null;
   if (!user) return <Login />;
+
   const Page = pageMap[activePage] || Overview;
   const currentTitle = pageTitleMap[activePage] || 'Farm Overview';
   const avatarLabel = (user?.displayName || user?.email || 'User').trim();
@@ -223,7 +246,15 @@ export default function App() {
             boxShadow: isMobile ? '0 8px 24px rgba(15,23,42,0.12)' : '0 2px 12px rgba(15,23,42,0.08)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, justifyContent: isMobile ? 'flex-start' : 'center' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              minWidth: 0,
+              justifyContent: isMobile ? 'flex-start' : 'center',
+            }}
+          >
             {isMobile ? (
               <button
                 type="button"
@@ -324,7 +355,7 @@ export default function App() {
               style={{ height: 30, padding: '0 12px', borderRadius: 999, cursor: 'pointer' }}
               aria-label="Toggle dark mode"
             >
-              {darkMode ? 'Dark' : 'Light'} {darkMode ? '☾' : '☀'}
+              {darkMode ? 'Switch to Light' : 'Switch to Dark'} {darkMode ? '☀' : '☾'}
             </button>
 
             {!isMobile && (
@@ -340,7 +371,13 @@ export default function App() {
                   }}
                 >
                   <span className="avatar-dot">{avatarLetter}</span>
-                  <ChevronDown size={14} style={{ transform: profileMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+                  <ChevronDown
+                    size={14}
+                    style={{
+                      transform: profileMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s ease',
+                    }}
+                  />
                 </button>
 
                 <div
@@ -362,11 +399,34 @@ export default function App() {
                     zIndex: 120,
                   }}
                 >
-                  <div style={{ padding: '6px 8px 10px', borderBottom: '1px solid rgba(148,163,184,0.2)', marginBottom: 8 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-strong)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div
+                    style={{
+                      padding: '6px 8px 10px',
+                      borderBottom: '1px solid rgba(148,163,184,0.2)',
+                      marginBottom: 8,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: 'var(--text-strong)',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
                       {user?.displayName || 'Farmora User'}
                     </div>
-                    <div style={{ fontSize: 11, color: 'var(--text-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: 'var(--text-soft)',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
                       {user?.email || 'No email'}
                     </div>
                   </div>
@@ -421,18 +481,19 @@ export default function App() {
           </div>
         </div>
 
-        <div className="animate-fade-in" key={activePage} style={{ marginTop: 0 }}>
+        <div className="animate-fade-in" key={`${activePage}-${selectedFieldId}`} style={{ marginTop: 0 }}>
           {activePage === 'farmora-ai' ? (
             <FarmoraAIPage onBack={() => handleNav('overview')} />
+          ) : activePage === 'crop-field-detail' ? (
+            <CropFieldDetail
+              fieldId={selectedFieldId}
+              onBack={() => handleNav('crop-health')}
+            />
           ) : (
-            <Page onNav={handleNav} />
+            <Page onNav={handleNav} onOpenField={openField} />
           )}
         </div>
       </main>
-
-
     </div>
   );
 }
-
-
