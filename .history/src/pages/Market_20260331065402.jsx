@@ -169,6 +169,95 @@ export default function Market() {
     </div>
   );
 }
+                <div style={{ fontSize: 11, color: 'var(--text-soft)', marginBottom: 6 }}>{buyer.type} - {buyer.distance}</div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
+                  {buyer.crops.map(c => <span key={c} className="chip chip-green">{c}</span>)}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-soft)', fontWeight: 600 }}>Offering: {buyer.priceOffer}</div>
+              </div>
+              <div style={{ textAlign: 'right', marginLeft: 16 }}>
+                <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '1.3rem', color: '#475569' }}>{buyer.rating}</div>
+                <div style={{ fontSize: 10, color: 'var(--text-soft)' }}>Rating</div>
+                <button style={{ marginTop: 10, background: 'rgba(100,116,139,0.2)', border: 'none', color: '#475569', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'Manrope, sans-serif', boxShadow: '0 6px 14px rgba(15,23,42,0.1)' }}>
+                  Contact
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Tab: QR Traceability ── */}
+      {tab === 'qr' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div className="card" style={{ padding: '24px' }}>
+            <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15, color: '#f0f4f0', marginBottom: 4 }}>QR Traceability</div>
+            <div style={{ fontSize: 12, color: '#8a9e8a', marginBottom: 20 }}>Prove quality to premium buyers</div>
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <div style={{ display: 'inline-block', padding: 14, background: 'white', borderRadius: 12 }}>
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                  {[...Array(10)].map((_, row) => [...Array(10)].map((_, col) => {
+                    const on = (row + col) % 2 === 0 || (row < 3 && col < 3) || (row < 3 && col > 6) || (row > 6 && col < 3);
+                    return on ? <rect key={`${row}-${col}`} x={col*10} y={row*10} width={9} height={9} fill="#1e3a1e" rx={1} /> : null;
+                  }))}
+                </svg>
+              </div>
+              <div style={{ fontSize: 11, color: '#4a9e4a', marginTop: 8, fontWeight: 600 }}>FM-A-2026-0330-MAIZE</div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[
+                { label: 'Field',              val: 'Field A · North Plot' },
+                { label: 'Harvest Date',       val: '12 April 2026 (est.)' },
+                { label: 'Pesticide-free',     val: '✓ 28 days clear' },
+                { label: 'Moisture at harvest',val: '14.2%' },
+                { label: 'Certifications',     val: 'GAP Compliant' },
+              ].map(r => (
+                <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid rgba(74,158,74,0.1)', fontSize: 12 }}>
+                  <span style={{ color: '#8a9e8a' }}>{r.label}</span>
+                  <span style={{ color: '#f0f4f0', fontWeight: 600 }}>{r.val}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="card" style={{ padding: '24px' }}>
+            <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15, color: '#f0f4f0', marginBottom: 16 }}>Why QR Traceability?</div>
+            {[
+              { icon: '💰', title: 'Premium pricing',   desc: 'Verified produce commands 8–15% more from retailers and exporters.' },
+              { icon: '🤝', title: 'Buyer trust',        desc: 'Scan-to-verify gives buyers instant confidence before committing.' },
+              { icon: '📋', title: 'Compliance ready',   desc: 'Export documentation auto-generated from your farm data.' },
+              { icon: '🔒', title: 'Tamper-proof',       desc: 'QR codes are unique per batch — cannot be reused or faked.' },
+            ].map(r => (
+              <div key={r.title} style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+                <span style={{ fontSize: 22, flexShrink: 0 }}>{r.icon}</span>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 13, color: '#f0f4f0', marginBottom: 3 }}>{r.title}</div>
+                  <div style={{ fontSize: 12, color: '#8a9e8a', lineHeight: 1.5 }}>{r.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Modals */}
+      {showModal && <ListingModal onClose={() => setModal(false)} onSubmit={handleSubmit} />}
+
+      {/* Toast */}
+      {toast && (
+        <div style={{
+          position: 'fixed', bottom: 28, right: 28, zIndex: 300,
+          background: 'linear-gradient(135deg, rgba(20,48,20,0.99), rgba(10,25,10,0.99))',
+          border: '1px solid rgba(74,158,74,0.45)', borderRadius: 14,
+          padding: '14px 20px', fontSize: 13, color: '#f0f4f0', fontWeight: 600,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          animation: 'slide-in 0.3s ease forwards', maxWidth: 360,
+        }}>
+          {toast}
+        </div>
+      )}
+    </div>
+  );
+}
 
 
 

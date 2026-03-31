@@ -185,7 +185,6 @@ export default function Sidebar({
           </div>
         ))}
       </nav>
-      </aside>
     </>
   );
 }
