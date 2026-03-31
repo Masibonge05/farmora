@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/useMediaQuery.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1774931878350,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1774931878350,
+            "name": "Commit-0",
+            "content": "import { useEffect, useState } from 'react';\r\n\r\nexport default function useMediaQuery(query) {\r\n  const getMatches = () => {\r\n    if (typeof window === 'undefined') {\r\n      return false;\r\n    }\r\n    return window.matchMedia(query).matches;\r\n  };\r\n\r\n  const [matches, setMatches] = useState(getMatches);\r\n\r\n  useEffect(() => {\r\n    const mediaQuery = window.matchMedia(query);\r\n    const onChange = (event) => setMatches(event.matches);\r\n\r\n    setMatches(mediaQuery.matches);\r\n    mediaQuery.addEventListener('change', onChange);\r\n\r\n    return () => mediaQuery.removeEventListener('change', onChange);\r\n  }, [query]);\r\n\r\n  return matches;\r\n}\r\n"
+        }
+    ]
+}
