@@ -60,10 +60,28 @@ const topNavItems = [
   { id: 'weather', label: 'Weather', icon: CloudRain },
 ];
 
+const THEME_STORAGE_KEY = 'farmora-theme';
+
+const getInitialTheme = () => {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+  if (savedTheme === 'dark') {
+    return true;
+  }
+  if (savedTheme === 'light') {
+    return false;
+  }
+
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+};
+
 export default function App() {
   const [activePage, setActivePage] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('farmora-theme') === 'dark');
+  const [darkMode, setDarkMode] = useState(getInitialTheme);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [profileMenuError, setProfileMenuError] = useState('');
   const [navIndicator, setNavIndicator] = useState({ left: 0, width: 0, visible: false });
@@ -76,7 +94,8 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-    localStorage.setItem('farmora-theme', darkMode ? 'dark' : 'light');
+    document.documentElement.style.colorScheme = darkMode ? 'dark' : 'light';
+    localStorage.setItem(THEME_STORAGE_KEY, darkMode ? 'dark' : 'light');
   }, [darkMode]);
 
   useEffect(() => {
@@ -324,7 +343,7 @@ export default function App() {
               style={{ height: 30, padding: '0 12px', borderRadius: 999, cursor: 'pointer' }}
               aria-label="Toggle dark mode"
             >
-              {darkMode ? 'Dark' : 'Light'} {darkMode ? '☾' : '☀'}
+              {darkMode ? 'Switch to Light' : 'Switch to Dark'} {darkMode ? '☀' : '☾'}
             </button>
 
             {!isMobile && (

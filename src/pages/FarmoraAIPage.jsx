@@ -24,6 +24,7 @@ import {
   Trash2,
   MessageSquare,
 } from "lucide-react";
+import { farmFields, sensorNodes, weatherData } from "../data/dummyData";
 
 const API_BASE = "https://farmora-backend-5du1.onrender.com";
 const STORAGE_KEY = "farmora_ai_chat_history_v2";
@@ -791,6 +792,39 @@ export default function FarmoraAIPage({ onBack }) {
   const activeLanguage =
     languages.find((l) => l.code === selectedLanguage) || languages[0];
 
+  const weatherSensorContext = useMemo(() => {
+    const current = weatherData?.current || {};
+    const driestFields = [...farmFields]
+      .sort((a, b) => a.moisture - b.moisture)
+      .slice(0, 2)
+      .map((f) => `${f.name} (${f.moisture}% moisture)`);
+
+    const weakSensors = sensorNodes.filter((s) => ["Weak", "Poor", "None"].includes(s.signal));
+    const lowBatterySensors = sensorNodes.filter((s) => s.battery < 20);
+
+    const forecast = (weatherData?.forecast || [])
+      .map((d) => `${d.day}: high ${d.high}C, rain ${d.rain}`)
+      .join(" | ");
+
+    const recommendations = [
+      driestFields.length
+        ? `Prioritize irrigation for ${driestFields.join(", ")} before the next rain event.`
+        : "Moisture profile stable across fields.",
+      weakSensors.length
+        ? `Investigate weak-signal sensors: ${weakSensors.map((s) => s.id).join(", ")}.`
+        : "Sensor signal quality is stable.",
+      lowBatterySensors.length
+        ? `Replace/charge low battery sensors: ${lowBatterySensors.map((s) => s.id).join(", ")}.`
+        : "No immediate battery risk detected.",
+    ];
+
+    return {
+      weatherNow: `Temp ${current.temp ?? "-"}C, humidity ${current.humidity ?? "-"}%, wind ${current.wind ?? "-"} km/h, condition ${current.condition ?? "Unknown"}`,
+      forecast,
+      recommendations,
+    };
+  }, []);
+
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -980,6 +1014,13 @@ export default function FarmoraAIPage({ onBack }) {
     }
 
     const userText = message.trim() || transcript.trim();
+    const contextBlock = [
+      "[Farm telemetry context]",
+      `Current weather: ${weatherSensorContext.weatherNow}`,
+      `Forecast: ${weatherSensorContext.forecast}`,
+      ...weatherSensorContext.recommendations.map((r, i) => `Recommendation ${i + 1}: ${r}`),
+    ].join("\n");
+    const modelMessage = `${userText}\n\n${contextBlock}`;
 
     const userMessage = {
       id: crypto.randomUUID(),
@@ -999,12 +1040,13 @@ export default function FarmoraAIPage({ onBack }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: message.trim(),
+          message: modelMessage,
           imageBase64: imageBase64 || null,
           audioBase64: audioBase64 || null,
           transcript: transcript || null,
           location,
           language: selectedLanguage,
+          weatherSensorContext,
         }),
       });
 
