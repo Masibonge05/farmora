@@ -1,3 +1,4 @@
+import { useState, useContext } from 'react';
 import { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Overview from './pages/Overview';
@@ -8,6 +9,8 @@ import Sensors from './pages/Sensors';
 import Alerts from './pages/Alerts';
 import Weather from './pages/Weather';
 import FarmoraAIPage from './pages/FarmoraAIPage';
+import AuthContext from './contexts/AuthContext';
+import Login from './components/Login';
 
 import { fetchWeather } from './services/weatherService';
 
@@ -100,6 +103,10 @@ function SplashScreen({ onDone }) {
 // ── App ─────────────────────────────────────────────────────────
 export default function App() {
   const [activePage, setActivePage] = useState('overview');
+  const { user, loading } = useContext(AuthContext);
+
+  if (loading) return null;
+  if (!user) return <Login />;
   const [showSplash, setShowSplash]  = useState(true);
   const [isDark, setIsDark]          = useState(true);
 
