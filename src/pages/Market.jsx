@@ -166,17 +166,10 @@ export default function Market() {
             {/* Real Scannable QR Code */}
             <div style={{ display: 'inline-block', padding: 14, background: 'white', borderRadius: 12, border: '2px solid rgba(34,197,94,0.3)', transition: 'all 0.2s' }}>
               <QRCode 
-                value={JSON.stringify({
-                  id: 'FM-A-2026-0330-MAIZE',
-                  farmer: 'Thabo\'s Precision Farm',
-                  farmerId: 'FARM-THA-001',
-                  crops: ['Maize', 'Sorghum'],
-                  rating: 4.8,
-                  location: 'Gauteng, South Africa'
-                })}
-                size={100}
+                value="https://farmora.app/verify?id=FM-A-2026-0330-MAIZE&farmer=FARM-THA-001&farm=Thabos-Precision-Farm"
+                size={120}
                 level="H"
-                includeMargin={false}
+                includeMargin={true}
                 fgColor="#1f2937"
                 bgColor="#ffffff"
               />
