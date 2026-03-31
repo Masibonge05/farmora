@@ -6,6 +6,7 @@ import { AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
 import { farmFields, soilMetrics, yieldForecast, alerts, weatherData, marketPrices } from '../data/dummyData';
 import useMediaQuery from '../lib/useMediaQuery';
 import { getFieldStyle } from '../lib/fieldColors';
+import RealtimeStream from '../components/RealtimeStream.jsx';
 
 const statusColor = { healthy: '#22c55e', warning: '#f59e0b', alert: '#ef4444' };
 const statusLabel = { healthy: 'Healthy', warning: 'Warning', alert: 'Alert' };
@@ -196,6 +197,9 @@ export default function Overview({ onNav, weather }) {
               <Area type="monotone" dataKey="moisture" name="Moisture %" stroke="#6f9b86" fill="url(#moistGrad)" strokeWidth={2} dot={false} />
             </AreaChart>
           </ResponsiveContainer>
+          <div style={{ marginTop: 12 }}>
+            <RealtimeStream path="/farms/thabo-farm" />
+          </div>
         </div>
 
         <div className="card glass-panel" style={{ padding: '20px 24px' }}>
