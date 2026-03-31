@@ -7,7 +7,7 @@ import { AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
 import { farmFields, soilMetrics, yieldForecast, alerts, marketPrices } from '../data/dummyData';
 import useMediaQuery from '../lib/useMediaQuery';
 import { getFieldStyle } from '../lib/fieldColors';
-import RealtimeStream from '../components/RealtimeStream.jsx';
+
 import useRealtimeFarmFeed from '../lib/useRealtimeFarmFeed';
 import { fetchWeather } from '../services/weatherService';
 
@@ -382,7 +382,74 @@ export default function Overview({ onNav }) {
             </AreaChart>
           </ResponsiveContainer>
           <div style={{ marginTop: 12 }}>
-            <RealtimeStream path={realtimePath} data={realtimeData} status={realtimeStatus} />
+            {/* Actionable Recommendations */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {soilReading != null && dryThresholdReading != null && soilReading < dryThresholdReading && (
+                <div style={{ 
+                  padding: '10px 12px', 
+                  background: 'rgba(239, 68, 68, 0.1)', 
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  color: '#ef4444',
+                  fontWeight: 600
+                }}>
+                  🚨 Soil critically dry ({soilReading.toFixed(0)} &lt; {dryThresholdReading.toFixed(0)}) — Activate irrigation now
+                </div>
+              )}
+              {temperatureReading != null && temperatureReading > 35 && (
+                <div style={{ 
+                  padding: '10px 12px', 
+                  background: 'rgba(245, 158, 11, 0.1)', 
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  color: '#f59e0b',
+                  fontWeight: 600
+                }}>
+                  ⚠️ High temperature ({temperatureReading.toFixed(1)}°C) — Monitor for heat stress
+                </div>
+              )}
+              {humidityReading != null && humidityReading < 30 && (
+                <div style={{ 
+                  padding: '10px 12px', 
+                  background: 'rgba(245, 158, 11, 0.1)', 
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  color: '#f59e0b',
+                  fontWeight: 600
+                }}>
+                  ⚠️ Low humidity ({humidityReading.toFixed(1)}%) — Increase water retention
+                </div>
+              )}
+              {pumpState === 'ON' && (
+                <div style={{ 
+                  padding: '10px 12px', 
+                  background: 'rgba(34, 197, 94, 0.1)', 
+                  border: '1px solid rgba(34, 197, 94, 0.3)',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  color: '#22c55e',
+                  fontWeight: 600
+                }}>
+                  ✓ Pump active — Irrigation running ({realtimeStatus})
+                </div>
+              )}
+              {soilReading != null && dryThresholdReading != null && soilReading >= dryThresholdReading && pumpState !== 'ON' && (
+                <div style={{ 
+                  padding: '10px 12px', 
+                  background: 'rgba(34, 197, 94, 0.1)', 
+                  border: '1px solid rgba(34, 197, 94, 0.3)',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  color: '#22c55e',
+                  fontWeight: 600
+                }}>
+                  ✓ Soil moisture optimal — Continue monitoring
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
