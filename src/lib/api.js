@@ -21,3 +21,4 @@ export async function apiRequest(path, { token, method = 'GET', baseUrl = import
     return text
   }
 }
+

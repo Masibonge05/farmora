@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react'
+﻿import React, { createContext, useEffect, useState } from 'react'
 import { auth, provider } from '../firebase'
 import {
   signInWithPopup as firebaseSignInWithPopup,
@@ -61,3 +61,6 @@ export function AuthProvider({ children }) {
 }
 
 export default AuthContext
+
+
+

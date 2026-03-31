@@ -26,3 +26,4 @@ const userSlice = createSlice({
 
 export const { setUser, clearUser, setLastUser, clearLastUser } = userSlice.actions
 export default userSlice.reducer
+
