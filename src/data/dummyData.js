@@ -64,3 +64,4 @@ export const weatherData = {
     { day: 'Friday', high: 23, low: 13, rain: '15%', icon: '🌤' },
   ]
 };
+
