@@ -1,35 +1,26 @@
-import { weatherData } from '../data/dummyData';
+import { useState, useEffect } from 'react';
+import { fetchWeather } from '../services/weatherService';
 
-const hourlyForecast = [
-  { time: '06:00', temp: 17, icon: '🌤', rain: 5 },
-  { time: '08:00', temp: 19, icon: '⛅', rain: 5 },
-  { time: '10:00', temp: 22, icon: '☀️', rain: 0 },
-  { time: '12:00', temp: 24, icon: '☀️', rain: 0 },
-  { time: '14:00', temp: 26, icon: '☀️', rain: 0 },
-  { time: '16:00', temp: 25, icon: '⛅', rain: 10 },
-  { time: '18:00', temp: 22, icon: '🌤', rain: 15 },
-  { time: '20:00', temp: 19, icon: '🌙', rain: 5 },
-];
-
-const extendedForecast = [
-  { day: 'Monday',    date: '31 Mar', high: 26, low: 14, rain: 10, icon: '🌤', condition: 'Mostly Sunny',  humidity: 52, wind: 10 },
-  { day: 'Tuesday',   date: '1 Apr',  high: 24, low: 13, rain: 25, icon: '⛅', condition: 'Partly Cloudy', humidity: 60, wind: 14 },
-  { day: 'Wednesday', date: '2 Apr',  high: 21, low: 12, rain: 70, icon: '🌧', condition: 'Rain Expected', humidity: 78, wind: 18 },
-  { day: 'Thursday',  date: '3 Apr',  high: 18, low: 10, rain: 85, icon: '⛈', condition: 'Heavy Rain',    humidity: 88, wind: 22 },
-  { day: 'Friday',    date: '4 Apr',  high: 23, low: 13, rain: 15, icon: '🌤', condition: 'Clearing',      humidity: 55, wind: 12 },
-];
-
-const irrigationAdvisory = [
-  { field: 'Field A', crop: 'Maize',    today: 'Run',            note: 'Normal schedule. Rain Wed may offset future needs.',         status: 'ok'    },
-  { field: 'Field B', crop: 'Tomatoes', today: 'Run — Urgent',   note: 'Moisture at 42%. Do not wait for Wednesday rain.',           status: 'warn'  },
-  { field: 'Field C', crop: 'Spinach',  today: 'Skip',           note: 'Moisture at 74%. Wednesday rain will be sufficient.',        status: 'ok'    },
-  { field: 'Field D', crop: 'Sorghum',  today: 'Run — CRITICAL', note: 'Moisture at 28%. Run immediately — 4hrs at 6L/hr.',         status: 'alert' },
-];
-
-const statusColors = { ok: '#7ec87e', warn: '#e8a020', alert: '#c85820' };
+// Keep irrigationAdvisory here — it's farm-specific, not from the API
+const irrigationAdvisory = [ /* your existing array */ ];
 
 export default function Weather() {
-  const { current } = weatherData;
+  const [weather, setWeather] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState(null);
+
+  useEffect(() => {
+    fetchWeather()
+      .then(setWeather)
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div style={{ color: '#8a9e8a', padding: 32 }}>Loading weather...</div>;
+  if (error)   return <div style={{ color: '#c85820', padding: 32 }}>Error: {error}</div>;
+
+  // Destructure — replaces your old dummy data variables
+  const { current, hourlyForecast, extendedForecast } = weather;
   const maxTemp = Math.max(...extendedForecast.map(d => d.high));
 
   return (
