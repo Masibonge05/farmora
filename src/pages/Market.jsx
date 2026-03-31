@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import QRCode from 'qrcode.react';
 import { marketPrices } from '../data/dummyData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import useMediaQuery from '../lib/useMediaQuery';
@@ -162,17 +163,26 @@ export default function Market() {
           <div style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 20 }}>Scan or click to verify farmer produce</div>
           
           <div style={{ textAlign: 'center', marginBottom: 20, cursor: 'pointer' }} onClick={() => handleQRClick('FM-A-2026-0330-MAIZE')}>
-            {/* QR grid */}
-            <div style={{ display: 'inline-block', padding: 14, background: 'white', borderRadius: 12, border: '2px solid rgba(34,197,94,0.3)', transition: 'all 0.2s', transform: 'scale(1)', _hover: { transform: 'scale(1.02)' } }}>
-              <svg width="100" height="100" viewBox="0 0 100 100">
-                {[...Array(10)].map((_, row) => [...Array(10)].map((_, col) => {
-                  const on = Math.random() > 0.45 || (row < 3 && col < 3) || (row < 3 && col > 6) || (row > 6 && col < 3);
-                  return on ? <rect key={`${row}-${col}`} x={col*10} y={row*10} width={9} height={9} fill="#2a2319" rx={1} /> : null;
-                }))}
-              </svg>
+            {/* Real Scannable QR Code */}
+            <div style={{ display: 'inline-block', padding: 14, background: 'white', borderRadius: 12, border: '2px solid rgba(34,197,94,0.3)', transition: 'all 0.2s' }}>
+              <QRCode 
+                value={JSON.stringify({
+                  id: 'FM-A-2026-0330-MAIZE',
+                  farmer: 'Thabo\'s Precision Farm',
+                  farmerId: 'FARM-THA-001',
+                  crops: ['Maize', 'Sorghum'],
+                  rating: 4.8,
+                  location: 'Gauteng, South Africa'
+                })}
+                size={100}
+                level="H"
+                includeMargin={false}
+                fgColor="#1f2937"
+                bgColor="#ffffff"
+              />
             </div>
             <div style={{ fontSize: 11, color: 'var(--text-soft)', marginTop: 8, fontWeight: 600 }}>FM-A-2026-0330-MAIZE</div>
-            <div style={{ fontSize: 10, color: '#22c55e', marginTop: 4, fontWeight: 600, cursor: 'pointer' }}>Tap to view farmer produce →</div>
+            <div style={{ fontSize: 10, color: '#22c55e', marginTop: 4, fontWeight: 600, cursor: 'pointer' }}>Scan or tap to view farmer produce →</div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
