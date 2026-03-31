@@ -89,6 +89,7 @@ function FieldCard({ field }) {
         <div style={{ height: 5, background: '#f1f5f9', borderRadius: 4 }}>
           <div style={{ width: `${field.moisture}%`, height: '100%', background: '#6f9b86', borderRadius: 4, transition: 'width 1s ease' }} />
         </div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: '#7ec87e' }}>Open →</div>
       </div>
       <div style={{ marginTop: 10, fontSize: 10, color: 'var(--text-soft)' }}>Last scan: {field.lastScan}</div>
     </div>
@@ -111,7 +112,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-export default function Overview({ onNav }) {
+export default function Overview({ onNav, weather }) {
   const totalHectares = farmFields.reduce((s, f) => s + f.hectares, 0);
   const healthyCount = farmFields.filter(f => f.status === 'healthy').length;
   const criticalAlerts = alerts.filter((a) => a.type === 'alert').length;
@@ -292,6 +293,7 @@ export default function Overview({ onNav }) {
           </div>
         </div>
 
+        {/* ── Weather widget — live data ── */}
         <div>
           <div className="section-kicker" style={{ marginBottom: 6 }}>Climate Snapshot</div>
           <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 15, color: 'var(--text-strong)', marginBottom: 12 }}>Weather</div>

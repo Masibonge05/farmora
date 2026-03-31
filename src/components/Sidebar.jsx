@@ -3,6 +3,8 @@ import {
   ShoppingCart, Wifi, CloudRain, Rocket, LogOut
 } from 'lucide-react';
 
+import farmoraLogo from '../assets/farmora-logo.jpeg';
+
 const navItems = [
   { icon: LayoutDashboard, label: 'Overview', id: 'overview' },
   { icon: Leaf, label: 'Crop Health', id: 'crop-health' },
@@ -182,7 +184,6 @@ export default function Sidebar({
             {label}
           </div>
         ))}
-      </nav>
 
       <div style={{ padding: '10px 10px 14px' }}>
         <button

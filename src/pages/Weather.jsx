@@ -30,10 +30,54 @@ const irrigationAdvisory = [
 const statusColors = { ok: 'var(--ok)', warn: 'var(--warn)', alert: '#ef4444' };
 
 export default function Weather() {
-  const { current } = weatherData;
+  const [weather, setWeather] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+
+  // Update current time every minute
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 60000);
+    
+    return () => clearInterval(timer);
+  }, []);
+
+  // Fetch weather data
+  useEffect(() => {
+    fetchWeather()
+      .then(setWeather)
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div style={{ color: '#8a9e8a', padding: 32 }}>Loading weather...</div>;
+  if (error) return <div style={{ color: '#c85820', padding: 32 }}>Error: {error}</div>;
+
+  // Destructure real API data
+  const { current, hourlyForecast, extendedForecast, location, sunrise, sunset } = weather;
   const maxTemp = Math.max(...extendedForecast.map(d => d.high));
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isTablet = useMediaQuery('(max-width: 1100px)');
+
+  // Format current date and time
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      month: 'long', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+  };
+
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: false 
+    });
+  };
 
   return (
     <div style={{ padding: isMobile ? '18px 14px' : '28px 32px', width: '100%' }}>
@@ -46,7 +90,7 @@ export default function Weather() {
         </div>
       </div>
 
-      {/* Hero */}
+      {/* Hero Section */}
       <div style={{
         borderRadius: 20, padding: isMobile ? '20px 16px' : '32px 36px', marginBottom: 24,
         background: 'var(--weather-hero-bg)',
@@ -89,7 +133,7 @@ export default function Weather() {
         </div>
       </div>
 
-      {/* Hourly */}
+      {/* Hourly Forecast */}
       <div className="card" style={{ padding: '20px 24px', marginBottom: 24 }}>
           <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 15, color: 'var(--text-strong)', marginBottom: 16 }}>Today - Hourly</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, minmax(78px, 1fr))', gap: 8, overflowX: 'auto' }}>
@@ -163,7 +207,7 @@ export default function Weather() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {irrigationAdvisory.map(field => {
-              const col = statusColors[field.status];
+              const col = statusColors[field.status] || '#8a9e8a';
               return (
                 <div key={field.field} style={{
                   padding: '12px 14px', borderRadius: 12,
