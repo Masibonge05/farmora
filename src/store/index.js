@@ -2,6 +2,7 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import userReducer from './userSlice'
+import networkReducer from './networkSlice'
 
 // Some bundlers / import interop can yield a storage object that doesn't
 // directly expose the storage methods expected by redux-persist in the
@@ -23,12 +24,13 @@ try {
   storageEngine = storage
 }
 
-const rootReducer = combineReducers({ user: userReducer })
+const rootReducer = combineReducers({ user: userReducer, network: networkReducer })
 
 const persistConfig = {
   key: 'farmora_root',
   storage: storageEngine,
   whitelist: ['user'],
+  // 'network' is intentionally excluded — connection state is ephemeral
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

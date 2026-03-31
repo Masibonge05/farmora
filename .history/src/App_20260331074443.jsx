@@ -23,8 +23,6 @@ import Sensors from './pages/Sensors';
 import Alerts from './pages/Alerts';
 import Weather from './pages/Weather';
 import FarmoraAIPage from './pages/FarmoraAIPage';
-import NetworkLayer from './pages/NetworkLayer';
-import CropFieldDetail from './pages/CropFieldDetail';
 import AuthContext from './contexts/AuthContext';
 import Login from './components/Login';
 import useMediaQuery from './lib/useMediaQuery';
@@ -38,20 +36,17 @@ const pageMap = {
   alerts: Alerts,
   weather: Weather,
   'farmora-ai': FarmoraAIPage,
-  'network-layer': NetworkLayer,
 };
 
 const pageTitleMap = {
   overview: 'Farm Overview',
   'crop-health': 'Crop Health',
-  'crop-field-detail': 'Field Details',
   soil: 'Soil & Water',
   market: 'Market Prices',
   sensors: 'IoT Sensors',
   alerts: 'Alerts',
   weather: 'Weather',
   'farmora-ai': 'Farmora AI',
-  'network-layer': 'Network Layer',
 };
 
 const topNavItems = [
@@ -63,7 +58,6 @@ const topNavItems = [
   { id: 'market', label: 'Market', icon: ShoppingCart },
   { id: 'sensors', label: 'Sensors', icon: Wifi },
   { id: 'weather', label: 'Weather', icon: CloudRain },
-  { id: 'network-layer', label: 'Network', icon: Wifi },
 ];
 
 const THEME_STORAGE_KEY = 'farmora-theme';
@@ -83,44 +77,23 @@ const getInitialTheme = () => {
 
   return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
 };
-];
-
-const THEME_STORAGE_KEY = 'farmora-theme';
-
-const getInitialTheme = () => {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-
-  const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-  if (savedTheme === 'dark') return true;
-  if (savedTheme === 'light') return false;
-
-  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
-};
 
 export default function App() {
   const [activePage, setActivePage] = useState('overview');
-  const [selectedFieldId, setSelectedFieldId] = useState('field-a');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(getInitialTheme);
   const [darkMode, setDarkMode] = useState(getInitialTheme);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [profileMenuError, setProfileMenuError] = useState('');
   const [navIndicator, setNavIndicator] = useState({ left: 0, width: 0, visible: false });
-
   const profileMenuRef = useRef(null);
   const navShellRef = useRef(null);
   const navButtonRefs = useRef({});
-
   const { user, loading, signOut } = useContext(AuthContext);
   const isMobile = useMediaQuery('(max-width: 900px)');
   const isCompactHeader = useMediaQuery('(max-width: 1240px)');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-    document.documentElement.style.colorScheme = darkMode ? 'dark' : 'light';
-    localStorage.setItem(THEME_STORAGE_KEY, darkMode ? 'dark' : 'light');
     document.documentElement.style.colorScheme = darkMode ? 'dark' : 'light';
     localStorage.setItem(THEME_STORAGE_KEY, darkMode ? 'dark' : 'light');
   }, [darkMode]);
@@ -152,7 +125,8 @@ export default function App() {
   }, [profileMenuOpen]);
 
   useEffect(() => {
-    if (isMobile || activePage === 'crop-field-detail') {
+    if (isMobile) {
+      setNavIndicator((prev) => ({ ...prev, visible: false }));
       return;
     }
 
@@ -176,21 +150,16 @@ export default function App() {
     return () => {
       window.removeEventListener('resize', updateIndicator);
       shell?.removeEventListener('scroll', updateIndicator);
-      setNavIndicator({ left: 0, width: 0, visible: false });
     };
   }, [activePage, isMobile, isCompactHeader]);
 
   const handleNav = (page) => {
     setActivePage(page);
-    if (isMobile) setSidebarOpen(false);
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
     setProfileMenuOpen(false);
     setProfileMenuError('');
-  };
-
-  const openField = (fieldId) => {
-    setSelectedFieldId(fieldId);
-    setActivePage('crop-field-detail');
-    if (isMobile) setSidebarOpen(false);
   };
 
   const handleSignOut = async () => {
@@ -208,7 +177,9 @@ export default function App() {
     const currentName = user?.displayName || '';
     const nextName = window.prompt('Enter a display name', currentName);
 
-    if (nextName === null) return;
+    if (nextName === null) {
+      return;
+    }
 
     const cleanName = nextName.trim();
     if (!cleanName) {
@@ -227,7 +198,6 @@ export default function App() {
 
   if (loading) return null;
   if (!user) return <Login />;
-
   const Page = pageMap[activePage] || Overview;
   const currentTitle = pageTitleMap[activePage] || 'Farm Overview';
   const avatarLabel = (user?.displayName || user?.email || 'User').trim();
@@ -272,15 +242,7 @@ export default function App() {
             boxShadow: isMobile ? '0 8px 24px rgba(15,23,42,0.12)' : '0 2px 12px rgba(15,23,42,0.08)',
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              minWidth: 0,
-              justifyContent: isMobile ? 'flex-start' : 'center',
-            }}
-          >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, justifyContent: isMobile ? 'flex-start' : 'center' }}>
             {isMobile ? (
               <button
                 type="button"
@@ -382,7 +344,6 @@ export default function App() {
               aria-label="Toggle dark mode"
             >
               {darkMode ? 'Switch to Light' : 'Switch to Dark'} {darkMode ? '☀' : '☾'}
-              {darkMode ? 'Switch to Light' : 'Switch to Dark'} {darkMode ? '☀' : '☾'}
             </button>
 
             {!isMobile && (
@@ -398,13 +359,7 @@ export default function App() {
                   }}
                 >
                   <span className="avatar-dot">{avatarLetter}</span>
-                  <ChevronDown
-                    size={14}
-                    style={{
-                      transform: profileMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                      transition: 'transform 0.2s ease',
-                    }}
-                  />
+                  <ChevronDown size={14} style={{ transform: profileMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
                 </button>
 
                 <div
@@ -426,34 +381,11 @@ export default function App() {
                     zIndex: 120,
                   }}
                 >
-                  <div
-                    style={{
-                      padding: '6px 8px 10px',
-                      borderBottom: '1px solid rgba(148,163,184,0.2)',
-                      marginBottom: 8,
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 700,
-                        color: 'var(--text-strong)',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
+                  <div style={{ padding: '6px 8px 10px', borderBottom: '1px solid rgba(148,163,184,0.2)', marginBottom: 8 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-strong)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {user?.displayName || 'Farmora User'}
                     </div>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: 'var(--text-soft)',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
+                    <div style={{ fontSize: 11, color: 'var(--text-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {user?.email || 'No email'}
                     </div>
                   </div>
@@ -508,19 +440,18 @@ export default function App() {
           </div>
         </div>
 
-        <div className="animate-fade-in" key={`${activePage}-${selectedFieldId}`} style={{ marginTop: 0 }}>
+        <div className="animate-fade-in" key={activePage} style={{ marginTop: 0 }}>
           {activePage === 'farmora-ai' ? (
             <FarmoraAIPage onBack={() => handleNav('overview')} />
-          ) : activePage === 'crop-field-detail' ? (
-            <CropFieldDetail
-              fieldId={selectedFieldId}
-              onBack={() => handleNav('crop-health')}
-            />
           ) : (
-            <Page onNav={handleNav} onOpenField={openField} />
+            <Page onNav={handleNav} />
           )}
         </div>
       </main>
+
+
     </div>
   );
 }
+
+

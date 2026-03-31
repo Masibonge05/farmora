@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/main.jsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1774935884326,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1774935884326,
+            "name": "Commit-0",
+            "content": "import { StrictMode } from 'react'\r\nimport { createRoot } from 'react-dom/client'\r\nimport './index.css'\r\nimport App from './App.jsx'\r\nimport { AuthProvider } from './contexts/AuthContext'\r\nimport { Provider } from 'react-redux'\r\nimport { PersistGate } from 'redux-persist/integration/react'\r\nimport { store, persistor } from './store'\r\n\r\nconst savedTheme = window.localStorage.getItem('farmora-theme')\r\nconst prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches\r\nconst isDark = savedTheme ? savedTheme === 'dark' : prefersDark\r\n\r\ndocument.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')\r\ndocument.documentElement.style.colorScheme = isDark ? 'dark' : 'light'\r\n\r\ncreateRoot(document.getElementById('root')).render(\r\n  <StrictMode>\r\n    <Provider store={store}>\r\n      <PersistGate loading={null} persistor={persistor}>\r\n        <AuthProvider>\r\n          <App />\r\n        </AuthProvider>\r\n      </PersistGate>\r\n    </Provider>\r\n  </StrictMode>,\r\n)\r\n\r\n\r\n\r\n"
+        }
+    ]
+}
