@@ -209,7 +209,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-export default function Overview({ onNav, weather }) {
+export default function Overview({ onNav }) {
   const realtimePath = '/farms/thabo-farm/latest';
   const { data: realtimeData, status: realtimeStatus } = useRealtimeFarmFeed(realtimePath);
   const criticalAlerts = alerts.filter((a) => a.type === 'alert').length;

@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useRef } from 'react';
+import { createElement, useState, useContext, useEffect, useRef } from 'react';
 import { updateProfile } from 'firebase/auth';
 import {
   House,
@@ -288,7 +288,7 @@ export default function App() {
                     opacity: navIndicator.visible ? 1 : 0,
                   }}
                 />
-                {topNavItems.map(({ id, label, icon: Icon }) => (
+                {topNavItems.map(({ id, label, icon }) => (
                   <button
                     key={id}
                     ref={(el) => {
@@ -300,7 +300,7 @@ export default function App() {
                     role="tab"
                     aria-selected={activePage === id}
                   >
-                    <Icon size={14} />
+                    {createElement(icon, { size: 14 })}
                     {label}
                   </button>
                 ))}
