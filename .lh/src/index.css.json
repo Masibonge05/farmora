@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1774931878352,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1774935884381,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,9 @@\n @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap');\r\n @import \"tailwindcss\";\r\n \r\n :root {\r\n+  color-scheme: light;\r\n   --bg-1: #ffffff;\r\n   --bg-2: #f8fafc;\r\n   --surface-1: rgba(255, 255, 255, 0.96);\r\n   --surface-2: rgba(255, 255, 255, 0.98);\r\n@@ -31,8 +32,9 @@\n   --weather-metric-line: rgba(100, 116, 139, 0.12);\r\n }\r\n \r\n :root[data-theme='dark'] {\r\n+  color-scheme: dark;\r\n   --bg-1: #070d0a;\r\n   --bg-2: #0a1510;\r\n   --text-strong: #e8f3ec;\r\n   --text-soft: #b8cdc0;\r\n"
                 }
             ],
             "date": 1774931878352,

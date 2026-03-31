@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { weatherData } from '../data/dummyData';
+import { farmFields, sensorNodes, weatherData } from '../data/dummyData';
 import useMediaQuery from '../lib/useMediaQuery';
 import { fetchWeather } from '../services/weatherService';
 
@@ -30,6 +30,17 @@ const irrigationAdvisory = [
 ];
 
 const statusColors = { ok: 'var(--ok)', warn: 'var(--warn)', alert: '#ef4444' };
+
+const recommendationTone = {
+  high: { label: 'High Priority', color: '#ef4444' },
+  medium: { label: 'Medium Priority', color: 'var(--warn)' },
+  low: { label: 'Low Priority', color: 'var(--ok)' },
+};
+
+const parsePingMinutes = (lastPing = '') => {
+  const value = Number.parseInt(String(lastPing).replace(/[^0-9]/g, ''), 10);
+  return Number.isNaN(value) ? 0 : value;
+};
 
 export default function Weather() {
   const [weather, setWeather] = useState(null);
@@ -116,6 +127,79 @@ export default function Weather() {
     return `Heavy rain forecast ${highRainDays.join(', ')} (${Math.max(...extendedForecast.map((d) => d.rain))}%)`;
   }, [extendedForecast]);
 
+  const sensorSummary = useMemo(() => {
+    const lowBattery = sensorNodes.filter((s) => s.battery < 20);
+    const weakSignal = sensorNodes.filter((s) => ['Weak', 'Poor', 'None'].includes(s.signal));
+    const stalePings = sensorNodes.filter((s) => parsePingMinutes(s.lastPing) >= 20);
+    const warningSensors = sensorNodes.filter((s) => s.status !== 'online');
+
+    return { lowBattery, weakSignal, stalePings, warningSensors };
+  }, []);
+
+  const aiRecommendations = useMemo(() => {
+    const recs = [];
+    const highRainDays = extendedForecast.filter((d) => d.rain >= 60).map((d) => d.day);
+    const lowMoistureFields = farmFields.filter((f) => f.moisture < 45);
+    const veryDryFields = farmFields.filter((f) => f.moisture < 35);
+
+    if (highRainDays.length && lowMoistureFields.length) {
+      recs.push({
+        id: 'pre-rain-irrigation',
+        level: 'high',
+        title: 'Pre-rain irrigation window',
+        body: `Irrigate ${lowMoistureFields.map((f) => f.name.split(' — ')[0]).join(', ')} today before ${highRainDays[0]} rain. This prevents stress and lets rain top up tomorrow.`,
+      });
+    }
+
+    if (veryDryFields.length) {
+      recs.push({
+        id: 'critical-moisture',
+        level: 'high',
+        title: 'Critical soil moisture detected',
+        body: `Immediate watering is recommended for ${veryDryFields.map((f) => f.name).join(', ')} (below 35% moisture).`,
+      });
+    }
+
+    if (current.wind >= 18) {
+      recs.push({
+        id: 'wind-alert',
+        level: 'medium',
+        title: 'Delay spraying operations',
+        body: `Wind is ${current.wind} km/h. Delay foliar spraying until calmer conditions to reduce drift and waste.`,
+      });
+    }
+
+    if (sensorSummary.lowBattery.length || sensorSummary.stalePings.length) {
+      const affected = [...new Set([...sensorSummary.lowBattery, ...sensorSummary.stalePings].map((s) => s.id))];
+      recs.push({
+        id: 'sensor-maintenance',
+        level: 'medium',
+        title: 'Sensor maintenance needed',
+        body: `Check sensors ${affected.join(', ')} for battery/telemetry reliability before irrigation decisions.`,
+      });
+    }
+
+    if (sensorSummary.weakSignal.length >= 2) {
+      recs.push({
+        id: 'signal-quality',
+        level: 'low',
+        title: 'Improve gateway signal coverage',
+        body: `${sensorSummary.weakSignal.length} sensors report weak/poor signal. Consider repeater placement near the western plots.`,
+      });
+    }
+
+    if (!recs.length) {
+      recs.push({
+        id: 'stable-plan',
+        level: 'low',
+        title: 'Conditions stable',
+        body: 'Continue current irrigation schedule and monitor moisture trends every 4 hours.',
+      });
+    }
+
+    return recs;
+  }, [current.wind, extendedForecast, sensorSummary]);
+
   if (loading) {
     return <div style={{ color: 'var(--text-soft)', padding: 32 }}>Loading weather...</div>;
   }
@@ -200,6 +284,39 @@ export default function Weather() {
               {h.rain > 0 && <div style={{ fontSize: 10, color: 'var(--text-soft)', marginTop: 4 }}>Rain {h.rain}%</div>}
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="card" style={{ padding: '20px 24px', marginBottom: 24 }}>
+        <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 15, color: 'var(--text-strong)', marginBottom: 4 }}>
+          AI Recommendations (Weather + Sensors)
+        </div>
+        <div style={{ fontSize: 12, color: 'var(--text-soft)', marginBottom: 14 }}>
+          Generated from forecast risk, field moisture, and live sensor reliability.
+        </div>
+        <div style={{ display: 'grid', gap: 10 }}>
+          {aiRecommendations.map((rec) => {
+            const tone = recommendationTone[rec.level] || recommendationTone.low;
+            return (
+              <div
+                key={rec.id}
+                style={{
+                  borderRadius: 12,
+                  padding: '12px 14px',
+                  background: `${tone.color}12`,
+                  boxShadow: `inset 0 0 0 1px ${tone.color}40`,
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-strong)' }}>{rec.title}</div>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: tone.color, background: `${tone.color}22`, borderRadius: 999, padding: '3px 8px', whiteSpace: 'nowrap' }}>
+                    {tone.label}
+                  </span>
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-soft)', lineHeight: 1.45 }}>{rec.body}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

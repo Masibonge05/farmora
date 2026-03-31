@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1774931878350,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1774935884445,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,8 +5,9 @@\n import { AlertTriangle, Info, CheckCircle2 } from 'lucide-react';\r\n import { farmFields, soilMetrics, yieldForecast, alerts, weatherData, marketPrices } from '../data/dummyData';\r\n import useMediaQuery from '../lib/useMediaQuery';\r\n import { getFieldStyle } from '../lib/fieldColors';\r\n+import RealtimeStream from '../components/RealtimeStream.jsx';\r\n \r\n const statusColor = { healthy: '#22c55e', warning: '#f59e0b', alert: '#ef4444' };\r\n const statusLabel = { healthy: 'Healthy', warning: 'Warning', alert: 'Alert' };\r\n \r\n@@ -88,8 +89,9 @@\n         </div>\r\n         <div style={{ height: 5, background: '#f1f5f9', borderRadius: 4 }}>\r\n           <div style={{ width: `${field.moisture}%`, height: '100%', background: '#6f9b86', borderRadius: 4, transition: 'width 1s ease' }} />\r\n         </div>\r\n+        <div style={{ fontSize: 12, fontWeight: 700, color: '#7ec87e' }}>Open →</div>\r\n       </div>\r\n       <div style={{ marginTop: 10, fontSize: 10, color: 'var(--text-soft)' }}>Last scan: {field.lastScan}</div>\r\n     </div>\r\n   );\r\n@@ -110,9 +112,9 @@\n   }\r\n   return null;\r\n };\r\n \r\n-export default function Overview({ onNav }) {\r\n+export default function Overview({ onNav, weather }) {\r\n   const totalHectares = farmFields.reduce((s, f) => s + f.hectares, 0);\r\n   const healthyCount = farmFields.filter(f => f.status === 'healthy').length;\r\n   const criticalAlerts = alerts.filter((a) => a.type === 'alert').length;\r\n   const warningAlerts = alerts.filter((a) => a.type === 'warning').length;\r\n@@ -194,8 +196,11 @@\n               <Tooltip content={<CustomTooltip />} />\r\n               <Area type=\"monotone\" dataKey=\"moisture\" name=\"Moisture %\" stroke=\"#6f9b86\" fill=\"url(#moistGrad)\" strokeWidth={2} dot={false} />\r\n             </AreaChart>\r\n           </ResponsiveContainer>\r\n+          <div style={{ marginTop: 12 }}>\r\n+            <RealtimeStream path=\"/farms/thabo-farm\" />\r\n+          </div>\r\n         </div>\r\n \r\n         <div className=\"card glass-panel\" style={{ padding: '20px 24px' }}>\r\n           <div style={{ marginBottom: 16 }}>\r\n@@ -291,8 +296,9 @@\n             </div>\r\n           </div>\r\n         </div>\r\n \r\n+        {/* ── Weather widget — live data ── */}\r\n         <div>\r\n           <div className=\"section-kicker\" style={{ marginBottom: 6 }}>Climate Snapshot</div>\r\n           <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 15, color: 'var(--text-strong)', marginBottom: 12 }}>Weather</div>\r\n           <div\r\n"
                 }
             ],
             "date": 1774931878350,
