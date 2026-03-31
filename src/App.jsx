@@ -23,6 +23,7 @@ import Sensors from './pages/Sensors';
 import Alerts from './pages/Alerts';
 import Weather from './pages/Weather';
 import FarmoraAIPage from './pages/FarmoraAIPage';
+import NetworkLayer from './pages/NetworkLayer';
 import AuthContext from './contexts/AuthContext';
 import Login from './components/Login';
 import useMediaQuery from './lib/useMediaQuery';
@@ -36,6 +37,7 @@ const pageMap = {
   alerts: Alerts,
   weather: Weather,
   'farmora-ai': FarmoraAIPage,
+  'network-layer': NetworkLayer,
 };
 
 const pageTitleMap = {
@@ -47,6 +49,7 @@ const pageTitleMap = {
   alerts: 'Alerts',
   weather: 'Weather',
   'farmora-ai': 'Farmora AI',
+  'network-layer': 'Network Layer',
 };
 
 const topNavItems = [
@@ -58,6 +61,7 @@ const topNavItems = [
   { id: 'market', label: 'Market', icon: ShoppingCart },
   { id: 'sensors', label: 'Sensors', icon: Wifi },
   { id: 'weather', label: 'Weather', icon: CloudRain },
+  { id: 'network-layer', label: 'Network', icon: Wifi },
 ];
 
 const THEME_STORAGE_KEY = 'farmora-theme';

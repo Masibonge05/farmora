@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   AreaChart, Area, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -7,6 +8,7 @@ import { farmFields, soilMetrics, yieldForecast, alerts, weatherData, marketPric
 import useMediaQuery from '../lib/useMediaQuery';
 import { getFieldStyle } from '../lib/fieldColors';
 import RealtimeStream from '../components/RealtimeStream.jsx';
+import useRealtimeFarmFeed from '../lib/useRealtimeFarmFeed';
 
 const statusColor = { healthy: '#22c55e', warning: '#f59e0b', alert: '#ef4444' };
 const statusLabel = { healthy: 'Healthy', warning: 'Warning', alert: 'Alert' };
@@ -16,6 +18,100 @@ const alertIconByType = {
   warning: AlertTriangle,
   info: Info,
   success: CheckCircle2,
+};
+
+const numericOrNull = (value) => {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+};
+
+const getAtPath = (obj, path) => {
+  let cursor = obj;
+  for (const key of path) {
+    if (cursor == null || typeof cursor !== 'object') return null;
+    cursor = cursor[key];
+  }
+  return cursor;
+};
+
+const findFirstNestedMoisture = (node) => {
+  if (node == null || typeof node !== 'object') return null;
+
+  const entries = Object.entries(node);
+
+  for (const [key, value] of entries) {
+    if (!/moist/i.test(key)) continue;
+    const asNumber = numericOrNull(value);
+    if (asNumber != null) return asNumber;
+  }
+
+  for (const [, value] of entries) {
+    if (value && typeof value === 'object') {
+      const match = findFirstNestedMoisture(value);
+      if (match != null) return match;
+    }
+  }
+
+  return null;
+};
+
+const extractSoilMoisture = (payload) => {
+  if (!payload || typeof payload !== 'object') return null;
+
+  const preferredPaths = [
+    ['soil', 'moisture'],
+    ['soil', 'moisturePercent'],
+    ['soil_moisture'],
+    ['soilMoisture'],
+    ['sensors', 'soil', 'moisture'],
+    ['sensors', 'soil_moisture'],
+    ['latest', 'soil', 'moisture'],
+    ['latest', 'soil_moisture'],
+    ['latest', 'soilMoisture'],
+  ];
+
+  for (const path of preferredPaths) {
+    const value = numericOrNull(getAtPath(payload, path));
+    if (value != null) return value;
+  }
+
+  const soilBranch = payload.soil ?? payload.soilData ?? payload.sensors?.soil;
+  const fromSoilBranch = findFirstNestedMoisture(soilBranch);
+  if (fromSoilBranch != null) return fromSoilBranch;
+
+  return findFirstNestedMoisture(payload);
+};
+
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+const extractRawSoilReading = (payload) => {
+  if (!payload || typeof payload !== 'object') return null;
+
+  const directRaw = numericOrNull(payload.soil);
+  const directThreshold = numericOrNull(payload.dryThreshold);
+  if (directRaw != null) {
+    return {
+      raw: directRaw,
+      dryThreshold: directThreshold,
+      from: 'root',
+    };
+  }
+
+  const latestRaw = numericOrNull(payload.latest?.soil);
+  const latestThreshold = numericOrNull(payload.latest?.dryThreshold);
+  if (latestRaw != null) {
+    return {
+      raw: latestRaw,
+      dryThreshold: latestThreshold,
+      from: 'latest',
+    };
+  }
+
+  return null;
 };
 
 function MetricCard({ label, value, unit, sub, icon, color = '#475569', delay = 0, pulse = false }) {
@@ -114,13 +210,46 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function Overview({ onNav, weather }) {
-  const totalHectares = farmFields.reduce((s, f) => s + f.hectares, 0);
-  const healthyCount = farmFields.filter(f => f.status === 'healthy').length;
+  const realtimePath = '/farms/thabo-farm/latest';
+  const { data: realtimeData, status: realtimeStatus } = useRealtimeFarmFeed(realtimePath);
   const criticalAlerts = alerts.filter((a) => a.type === 'alert').length;
   const warningAlerts = alerts.filter((a) => a.type === 'warning').length;
   const resolvedAlerts = alerts.filter((a) => a.type === 'success').length;
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isTablet = useMediaQuery('(max-width: 1100px)');
+  const latestSnapshot = (realtimeData && typeof realtimeData === 'object' && realtimeData.latest)
+    ? realtimeData.latest
+    : realtimeData;
+  const latestDeviceId = latestSnapshot?.deviceId || 'device offline';
+  const soilReading = numericOrNull(latestSnapshot?.soil);
+  const humidityReading = numericOrNull(latestSnapshot?.humidity);
+  const temperatureReading = numericOrNull(latestSnapshot?.temperature);
+  const dryThresholdReading = numericOrNull(latestSnapshot?.dryThreshold);
+  const pumpState = typeof latestSnapshot?.pump === 'string' ? latestSnapshot.pump : '--';
+  const liveSoilMoisture = useMemo(() => {
+    const moistureValue = extractSoilMoisture(realtimeData);
+    if (moistureValue != null) {
+      return {
+        value: clamp(moistureValue, 0, 100),
+        source: 'moisture-field',
+      };
+    }
+
+    const rawReading = extractRawSoilReading(realtimeData);
+    if (!rawReading) return null;
+
+    return {
+      value: rawReading.raw,
+      source: 'soil-raw',
+      raw: rawReading.raw,
+      dryThreshold: rawReading.dryThreshold,
+    };
+  }, [realtimeData]);
+  const moistureSubtext = liveSoilMoisture?.source === 'soil-raw'
+    ? `Live IoT feed (${realtimeStatus})`
+    : liveSoilMoisture?.source === 'moisture-field'
+      ? `Live IoT feed (${realtimeStatus})`
+      : 'No moisture reading in feed (using baseline)';
 
   return (
     <div className="dashboard-frame" style={{ padding: isMobile ? '18px 14px' : '28px 32px', width: '100%' }}>
@@ -154,10 +283,43 @@ export default function Overview({ onNav, weather }) {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-        <MetricCard label="Total Area" value={totalHectares.toFixed(1)} unit="ha" sub="4 active fields" icon="A" color="#475569" delay={0} />
-        <MetricCard label="Healthy Fields" value={healthyCount} unit={`/${farmFields.length}`} sub="2 need attention" icon="H" color="#22c55e" delay={50} />
-        <MetricCard label="Avg Moisture" value="53" unit="%" sub="Field D critical" icon="M" color="#f59e0b" delay={100} />
-        <MetricCard label="Active Alerts" value="2" unit="" sub="1 critical - act now" icon="!" color="#ef4444" delay={150} pulse />
+        <MetricCard
+          label="Soil Sensor"
+          value={soilReading != null ? soilReading.toFixed(0) : '--'}
+          unit=""
+          sub={dryThresholdReading != null ? `Dry threshold ${dryThresholdReading.toFixed(0)}` : `Live ${realtimeStatus}`}
+          icon="S"
+          color="#f59e0b"
+          delay={0}
+        />
+        <MetricCard
+          label="Humidity"
+          value={humidityReading != null ? humidityReading.toFixed(1) : '--'}
+          unit="%"
+          sub={`Source ${latestDeviceId}`}
+          icon="H"
+          color="#475569"
+          delay={50}
+        />
+        <MetricCard
+          label="Temperature"
+          value={temperatureReading != null ? temperatureReading.toFixed(1) : '--'}
+          unit="C"
+          sub={`Source ${latestDeviceId}`}
+          icon="T"
+          color="#22c55e"
+          delay={100}
+        />
+        <MetricCard
+          label="Pump State"
+          value={pumpState}
+          unit=""
+          sub={moistureSubtext}
+          icon="P"
+          color={pumpState === 'ON' ? '#22c55e' : '#ef4444'}
+          delay={150}
+          pulse={pumpState === 'ON'}
+        />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 12, marginBottom: 22 }}>
@@ -198,7 +360,7 @@ export default function Overview({ onNav, weather }) {
             </AreaChart>
           </ResponsiveContainer>
           <div style={{ marginTop: 12 }}>
-            <RealtimeStream path="/farms/thabo-farm" />
+            <RealtimeStream path={realtimePath} data={realtimeData} status={realtimeStatus} />
           </div>
         </div>
 

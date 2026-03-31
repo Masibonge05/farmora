@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Leaf, Droplets, AlertTriangle,
-  ShoppingCart, Wifi, CloudRain, Rocket, LogOut
+  ShoppingCart, Wifi, CloudRain, Rocket, LogOut, Network,
 } from 'lucide-react';
 
 import farmoraLogo from '../assets/farmora-logo.jpeg';
@@ -14,6 +14,7 @@ const navItems = [
   { icon: ShoppingCart, label: 'Market Prices', id: 'market' },
   { icon: Wifi, label: 'IoT Sensors', id: 'sensors' },
   { icon: CloudRain, label: 'Weather', id: 'weather' },
+  { icon: Network, label: 'Network Layer', id: 'network-layer' },
 ];
 
 export default function Sidebar({
