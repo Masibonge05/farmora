@@ -74,25 +74,6 @@ const getInitialTheme = () => {
   }
 
   const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-  if (savedTheme === 'dark') {
-    return true;
-  }
-  if (savedTheme === 'light') {
-    return false;
-  }
-
-  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
-};
-];
-
-const THEME_STORAGE_KEY = 'farmora-theme';
-
-const getInitialTheme = () => {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-
-  const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
   if (savedTheme === 'dark') return true;
   if (savedTheme === 'light') return false;
 
@@ -103,7 +84,6 @@ export default function App() {
   const [activePage, setActivePage] = useState('overview');
   const [selectedFieldId, setSelectedFieldId] = useState('field-a');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(getInitialTheme);
   const [darkMode, setDarkMode] = useState(getInitialTheme);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [profileMenuError, setProfileMenuError] = useState('');
@@ -119,8 +99,6 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-    document.documentElement.style.colorScheme = darkMode ? 'dark' : 'light';
-    localStorage.setItem(THEME_STORAGE_KEY, darkMode ? 'dark' : 'light');
     document.documentElement.style.colorScheme = darkMode ? 'dark' : 'light';
     localStorage.setItem(THEME_STORAGE_KEY, darkMode ? 'dark' : 'light');
   }, [darkMode]);
@@ -381,7 +359,6 @@ export default function App() {
               style={{ height: 30, padding: '0 12px', borderRadius: 999, cursor: 'pointer' }}
               aria-label="Toggle dark mode"
             >
-              {darkMode ? 'Switch to Light' : 'Switch to Dark'} {darkMode ? '☀' : '☾'}
               {darkMode ? 'Switch to Light' : 'Switch to Dark'} {darkMode ? '☀' : '☾'}
             </button>
 
