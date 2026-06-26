@@ -1,18 +1,111 @@
-# React + Vite
+# 🌱 Farmora – AI-Powered Smart Farming Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> 🏆 **1st Place Winner – MICT SETA National Skills Challenge Hackathon Grand Finale 2026**
 
-Currently, two official plugins are available:
+Farmora is an intelligent smart agriculture platform that empowers farmers with real-time insights using **Artificial Intelligence (AI)**, **Internet of Things (IoT)**, **Cloud Computing**, and **Blockchain-based traceability**. The platform helps improve crop productivity, reduce resource wastage, and promote sustainable farming through data-driven decision-making.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Farmora was developed by a multidisciplinary team during the **MICT SETA National Skills Challenge Hackathon Grand Finale 2026**, where it was awarded **First Place** among South Africa's top student innovation teams.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# Project Overview
 
-## Expanding the ESLint configuration
+Agriculture plays a critical role in food security and economic development, yet many farmers still lack access to affordable technologies that provide actionable insights.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Farmora bridges this gap by combining AI, IoT, cloud technologies, and blockchain into a single platform that enables farmers to monitor their farms, receive intelligent recommendations, detect potential issues early, and improve transparency across the agricultural supply chain.
 
-# farmora
+The platform is designed to support both emerging and commercial farmers by making precision agriculture more accessible.
+
+---
+
+# Key Features
+
+## Real-Time Environmental Monitoring
+
+* Soil moisture monitoring
+* Temperature monitoring
+* Humidity monitoring
+* Continuous sensor data collection using IoT devices
+
+---
+
+## AI-Powered Farming Assistant
+
+* Intelligent farming recommendations
+* Early identification of potential crop issues
+* Data-driven decision support
+* Multilingual AI chatbot for farmer assistance
+
+---
+
+## Smart Farm Dashboard
+
+* Live environmental data visualization
+* Farm health monitoring
+* Historical sensor analytics
+* Mobile-friendly interface
+
+---
+
+##  Crop Management
+
+* Monitor field conditions
+* Improve irrigation efficiency
+* Reduce water wastage
+* Increase crop productivity
+
+---
+
+##  QR & Blockchain Traceability
+
+* QR code generation for produce
+* Farm-to-consumer traceability
+* Improved transparency throughout the supply chain
+* Enhanced consumer trust
+
+---
+
+## ☁️ Cloud Integration
+
+* Secure cloud storage
+* Real-time synchronization
+* Scalable architecture
+* Remote access to farm data
+
+---
+
+#  Technologies Used
+
+* React
+* Node.js
+* Firebase
+* ESP32
+* IoT Sensors
+* Artificial Intelligence
+* Cloud Computing
+* Blockchain
+* QR Code Technology
+
+
+
+---
+
+#  Impact
+
+Farmora was built to address several real-world agricultural challenges:
+
+* Improve food security
+* Support precision agriculture
+* Reduce unnecessary water consumption
+* Enable data-driven farming
+* Increase productivity for small-scale and commercial farmers
+* Improve supply chain transparency
+* Encourage sustainable farming practices
+
+---
+
+
+
+
+---
+
